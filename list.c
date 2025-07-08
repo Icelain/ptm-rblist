@@ -53,14 +53,14 @@ struct local_rec {
   int key;    // L_key
   int val;    // L_val
   TOID(struct rb_node)
-  preds[6]; // preds for BL predecessor, preds[8] for RL predecessor [7]
+  preds[6]; // preds for BL predecessor, preds[8] for RL predecessor
   TOID(struct rb_node)
-  currs[6]; // currs[8] for BL current, currs for RL current [7]
+  currs[6]; // currs[8] for BL current, currs for RL current
   TOID(struct rb_node)
   node; // The actual node found/inserted (used internally for the node itself)
-        // [32]
-  status_t op_status; // L_op_status [32]
-  op_name_t opn;      // L_opn [32]
+
+  status_t op_status; // L_op_status
+  op_name_t opn;      // L_opn
 };
 
 // Local transaction log (based on MVOptm L_txlog) [32]
