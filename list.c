@@ -1,4 +1,5 @@
 #include <libpmemobj.h>
+#include <limits.h>
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdbool.h>
