@@ -148,7 +148,7 @@ int stm_init(void) {
 
       // Initialize forward pointers to NULL
       for (int i = 0; i < MAX_LEVEL; i++) {
-        TX_SET_DIRECT(&D_RW(header)->forward[i], TOID_NULL(struct skip_node));
+        TX_SET_DIRECT(D_RW(header), forward[i], TOID_NULL(struct skip_node));
       }
 
       // Set root fields
@@ -177,7 +177,7 @@ int stm_begin(void) {
   // Thread-safe increment of global counter
   pthread_mutex_lock(&global_lock);
   local_txlog->tid = D_RO(root)->global_counter;
-  TX_BEGIN(pop) { TX_ADD(root, global_counter, 1); }
+  TX_BEGIN(pop) { TX_ADD_FIELD(root, global_counter); }
   TX_END
   pthread_mutex_unlock(&global_lock);
 
@@ -433,11 +433,12 @@ static int perform_insert(int key, int val) {
 
   // Link the new node
   for (int i = 0; i < level; i++) {
-    TX_SET_DIRECT(&D_RW(new_node)->forward[i], succs[i]);
-    TX_SET_DIRECT(&D_RW(preds[i])->forward[i], new_node);
+
+    TX_SET_DIRECT(D_RW(new_node), forward[i], succs[i]);
+    TX_SET_DIRECT(D_RW(preds[i]), forward[i], new_node);
   }
 
-  TX_ADD(root, node_count, 1);
+  TX_ADD_FIELD(root, node_count);
   return 0;
 }
 
