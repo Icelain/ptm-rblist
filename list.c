@@ -80,7 +80,7 @@ static __thread struct tx_log *local_txlog = NULL; // [33]
 #define NEG_INF INT_MIN // For head node
 #define POS_INF INT_MAX // For tail node
 
-// List insertion types for list_ins [14] (derived from Algorithm 17)
+// List insertion types for list_ins
 typedef enum {
   LIST_TYPE_RL_ONLY,            // Insert new node into RL only
   LIST_TYPE_RL_BL,              // Insert new node into RL and BL
@@ -536,30 +536,30 @@ static void common_lu_del(int obj_id, int key, int *val, status_t *op_status) {
       }
       TX_END
     }
-  } else { // Key not in lazyrb-list (needs 0th version creation) [29]
+  } else { // Key not in lazyrb-list (needs 0th version creation)
     TOID(struct rb_node) new_node;
     TOID(struct version_list) zero_vl;
     TOID(struct rb_root) root_oid = POBJ_ROOT(pop, struct rb_root);
 
-    TX_BEGIN(pop) {                       // This part must be transactional
-      new_node = TX_ZNEW(struct rb_node); // [29]
+    TX_BEGIN(pop) { // This part must be transactional
+      new_node = TX_ZNEW(struct rb_node);
       TX_SET(new_node, key, key);
-      TX_SET(new_node, marked, true); // Marked for lazy deletion [28, 29]
+      TX_SET(new_node, marked, true); // Marked for lazy deletion
       pthread_mutex_init(&D_RW(new_node)->lock,
                          NULL); // Initialize mutex for new node
 
-      zero_vl = TX_ZNEW(struct version_list); // [29]
-      TX_SET(zero_vl, ts, 0);  // Timestamp 0 for this special version [28, 29]
-      TX_SET(zero_vl, val, 0); // Null value [28, 29]
-      TX_SET(zero_vl, mark, true); // Mark this version as a deletion [28, 29]
+      zero_vl = TX_ZNEW(struct version_list); //
+      TX_SET(zero_vl, ts, 0);      // Timestamp 0 for this special version
+      TX_SET(zero_vl, val, 0);     // Null value
+      TX_SET(zero_vl, mark, true); // Mark this version as a deletion
       memset(D_RW(zero_vl)->rvl, 0, sizeof(D_RW(zero_vl)->rvl)); // Clear rvl
       TX_SET_FIELD(zero_vl, rvl,
-                   local_txlog->tid); // Add current transaction's ID [42]
+                   local_txlog->tid); // Add current transaction's ID
       TX_SET(zero_vl, vnext, TOID_NULL(struct version_list));
 
       TX_SET(new_node, vl, zero_vl); // Link version list to node
 
-      // Insert into RL only (as per commonLu&Del, Algo 11, line 198) [42]
+      // Insert into RL only
       // This implicitly calls list_ins with LIST_TYPE_RL_ONLY
       TX_SET(preds[8], RL, new_node);
       TX_SET(new_node, RL, currs);
@@ -595,11 +595,7 @@ static void intra_trans_validation(struct local_rec *rec_current,
                                    TOID(struct rb_node) currs_current[]) {
   // This function aims to update the `preds_current` and `currs_current`
   // of `rec_current` if previous operations in the *same transaction* have
-  // altered the path to `rec_current->key`.
-  // The source (Algorithm 23 [25]) is abstract on how `L reck` (previous
-  // record) is accessed. This simplified implementation re-looks up the path if
-  // validation fails, and updates the local record.
-
+  // altered the path to `rec_current->key`
   // Validate path correctness first.
   if (D_RO(preds_current)->marked ||
       !TOID_EQUALS(D_RO(preds_current)->BL, currs_current[8]) ||
