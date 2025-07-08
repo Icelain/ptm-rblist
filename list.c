@@ -14,16 +14,13 @@ POBJ_LAYOUT_TOID(rb_list_layout, struct version_list);
 POBJ_LAYOUT_ROOT(rb_list_layout, struct rb_root);
 POBJ_LAYOUT_END(rb_list_layout);
 
-// Color definitions (no longer used for RB tree properties, but type remains)
-typedef enum { RED = 0, BLUE = 1 } rb_color_t;
-
-// Operation types from MVOptm [6]
+// Operation types from MVOptm
 typedef enum { INSERT = 0, DELETE = 1, LOOKUP = 2 } op_name_t;
 
-// Status types from MVOptm [6]
+// Status types from MVOptm
 typedef enum { ABORT = 0, OK = 1, FAIL = 2, COMMIT = 3 } status_t;
 
-// Node structure for lazyrb-list (Skip List) [1, 4]
+// Node structure for lazyrb-list
 struct rb_node {
   int key;                      // G_key
   TOID(struct version_list) vl; // G_vl - version list
@@ -33,7 +30,7 @@ struct rb_node {
   bool marked;                  // Lazy deletion mark
 };
 
-// Version list structure (based on MVOptm G_vl) [4, 26]
+// Version list structure
 struct version_list {
   int ts;      // G_ts - timestamp
   int val;     // G_val - value
@@ -42,7 +39,7 @@ struct version_list {
   TOID(struct version_list) vnext; // G_vnext - next version
 };
 
-// Root structure for the persistent lazyrb-list [5]
+// Root structure for the persistent lazyrb-list
 struct rb_root {
   TOID(struct rb_node) head; // Sentinel head node (-infinity)
   TOID(struct rb_node) tail; // Sentinel tail node (+infinity)
@@ -50,7 +47,7 @@ struct rb_root {
   size_t node_count;
 };
 
-// Local transaction record (based on MVOptm L_rec) [32]
+// Local transaction record
 struct local_rec {
   int obj_id; // L_obj_id
   int key;    // L_key
