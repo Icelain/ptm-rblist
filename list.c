@@ -1,11 +1,11 @@
 #include <libpmemobj.h>
-#include <limits.h> // For INT_MIN, INT_MAX
+#include <limits.h>
 #include <pthread.h>
 #include <stdatomic.h>
-#include <stdbool.h> // For bool type
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // For memset
+#include <string.h>
 
 // Pool layout declaration
 POBJ_LAYOUT_BEGIN(rb_list_layout);
